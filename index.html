@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Breakfast Menu Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="menuContainer">Loading menu...</div>
+
+  <script>
+    window.onload = function () {
+      const xmlPath = "menu.xml";
+      const xslPath = "menu.xsl";
+
+      // Load XML
+      const xmlRequest = new XMLHttpRequest();
+      xmlRequest.open("GET", xmlPath, false); // synchronous
+      xmlRequest.send(null);
+      const xml = xmlRequest.responseXML;
+
+      // Load XSL
+      const xslRequest = new XMLHttpRequest();
+      xslRequest.open("GET", xslPath, false); // synchronous
+      xslRequest.send(null);
+      const xsl = xslRequest.responseXML;
+
+      // Transform using XSLTProcessor
+      if (window.XSLTProcessor) {
+        const processor = new XSLTProcessor();
+        processor.importStylesheet(xsl);
+        const resultDocument = processor.transformToFragment(xml, document);
+
+        // Inject the result into the container
+        document.getElementById("menuContainer").innerHTML = "";
+        document.getElementById("menuContainer").appendChild(resultDocument);
+      } else {
+        document.getElementById("menuContainer").innerText = "XSLT not supported in this browser.";
+      }
+    };
+  </script>
+
+</body>
+</html>
