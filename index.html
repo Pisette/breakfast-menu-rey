@@ -1,71 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Breakfast Menu</title>
-  <style>
-    body { font-family: Arial, sans-serif; }
-    .menu-section { margin-bottom: 2em; }
-    .menu-item { margin-bottom: 0.5em; }
-  </style>
+<meta charset="UTF-8">
+<title>Breakfast Menu</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  .food-block {
+    background-color: #007B7F;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .food-description {
+    background-color: #f9f9f9;
+    padding: 20px;
+    font-size: 14px;
+    color: black;
+  }
+  h2 {
+    margin-top: 30px;
+    color: #007B7F;
+  }
+</style>
 </head>
 <body>
-  <h1>Breakfast Menu</h1>
 
-  <div class="menu-section">
-    <h2>All Items</h2>
-    <div id="allItems"></div>
-  </div>
+<h2>Food whose price is greater than $5.00</h2>
+<div id="priceAbove5"></div>
 
-  <div class="menu-section">
-    <h2>Price > $5.00</h2>
-    <div id="priceAbove5"></div>
-  </div>
+<h2>Food whose calorie does not exceed 700 cal.</h2>
+<div id="caloriesBelow700"></div>
 
-  <div class="menu-section">
-    <h2>Calories ≤ 700</h2>
-    <div id="caloriesBelow700"></div>
-  </div>
+<script>
+fetch('menu.xml')
+  .then(response => response.text())
+  .then(xmlText => {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "application/xml");
 
-  <script>
-    fetch('menu.xml')
-      .then(response => response.text())
-      .then(xmlText => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+    const foods = Array.from(xmlDoc.getElementsByTagName('food'));
 
-        const foods = xmlDoc.getElementsByTagName('food');
+    const priceAbove5 = document.getElementById('priceAbove5');
+    const caloriesBelow700 = document.getElementById('caloriesBelow700');
 
-        const allItems = document.getElementById('allItems');
-        const priceAbove5 = document.getElementById('priceAbove5');
-        const caloriesBelow700 = document.getElementById('caloriesBelow700');
+    foods.forEach(food => {
+      const name = food.getElementsByTagName('name')[0].textContent;
+      const price = food.getElementsByTagName('price')[0].textContent;
+      const description = food.getElementsByTagName('description')[0].textContent;
+      const calories = parseInt(food.getElementsByTagName('calories')[0].textContent);
 
-        for (let i = 0; i < foods.length; i++) {
-          const name = foods[i].getElementsByTagName('name')[0].textContent;
-          const price = foods[i].getElementsByTagName('price')[0].textContent;
-          const description = foods[i].getElementsByTagName('description')[0].textContent;
-          const calories = parseInt(foods[i].getElementsByTagName('calories')[0].textContent);
+      const numericPrice = parseFloat(price.replace('$', ''));
 
-          const itemHTML = `<div class="menu-item">
-            <strong>${name}</strong><br>
-            Price: ${price}<br>
-            Description: ${description}<br>
-            Calories: ${calories} cal
-          </div>`;
+      const blockHTML = `
+        <div class="food-block">${name} - ${price}</div>
+        <div class="food-description">
+          ${description}
+          (${calories} calories per serving)
+        </div>`;
 
-          allItems.innerHTML += itemHTML;
+      if (numericPrice > 5.00) {
+        priceAbove5.innerHTML += blockHTML;
+      }
 
-          const numericPrice = parseFloat(price.replace('$', ''));
-          if (numericPrice > 5.00) {
-            priceAbove5.innerHTML += itemHTML;
-          }
+      if (calories <= 700) {
+        caloriesBelow700.innerHTML += blockHTML;
+      }
+    });
+  })
+  .catch(error => console.error('Error loading XML:', error));
+</script>
 
-          if (calories <= 700) {
-            caloriesBelow700.innerHTML += itemHTML;
-          }
-        }
-      })
-      .catch(error => console.error('Error loading XML:', error));
-  </script>
 </body>
 </html>
