@@ -28,14 +28,8 @@
 </head>
 <body>
 
-<!--   <h2 class="section-title">All Food Items</h2>
-  <div id="allItems"></div> -->
-
-  <h2 class="section-title">Food whose price is greater than $5.00</h2>
-  <div id="priceAbove5"></div>
-
-  <h2 class="section-title">Food whose calorie does not exceed 700 cal.</h2>
-  <div id="caloriesBelow700"></div>
+  <h2 class="section-title">Food whose price is greater than $5.00 and calorie does not exceed 700 cal.</h2>
+  <div id="filteredFoods"></div>
 
   <script>
     fetch('menu.xml')
@@ -45,10 +39,7 @@
         const xmlDoc = parser.parseFromString(xmlText, "application/xml");
 
         const foods = Array.from(xmlDoc.getElementsByTagName('food'));
-
-        // const allItems = document.getElementById('allItems');
-        const priceAbove5 = document.getElementById('priceAbove5');
-        const caloriesBelow700 = document.getElementById('caloriesBelow700');
+        const filteredFoodsContainer = document.getElementById('filteredFoods');
 
         foods.forEach(food => {
           const name = food.getElementsByTagName('name')[0].textContent;
@@ -58,27 +49,20 @@
 
           const numericPrice = parseFloat(price.replace('$', ''));
 
-          const blockHTML = `
-            <div class="food-block">${name} - ${price}</div>
-            <div class="food-description">
-              ${description} (${calories} calories)
-            </div>`;
-
-          // Display in All Items
-          // allItems.innerHTML += blockHTML;
-
-          // Display in price > $5.00
-          if (numericPrice > 5.00) {
-            priceAbove5.innerHTML += blockHTML;
-          }
-
-          // Display in calories ≤ 700
-          if (calories <= 700) {
-            caloriesBelow700.innerHTML += blockHTML;
+          if (numericPrice > 5.00 && calories <= 700) {
+            const blockHTML = `
+              <div class="food-block">${name} - ${price}</div>
+              <div class="food-description">
+                ${description} (${calories} calories)
+              </div>`;
+            filteredFoodsContainer.innerHTML += blockHTML;
           }
         });
       })
-      .catch(error => console.error('Error loading XML:', error));
+      .catch(error => {
+        console.error('Error loading XML:', error);
+        document.body.innerHTML = '<p style="color: red;">❌ Error loading the menu. Please check the XML file.</p>';
+      });
   </script>
 
 </body>
