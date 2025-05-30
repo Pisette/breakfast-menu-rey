@@ -2,10 +2,37 @@
 <html>
 <head>
     <title>Breakfast Menu Viewer</title>
+    <script>
+        function loadXMLDoc(filename) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", filename, false);
+            xhttp.send();
+            return xhttp.responseXML;
+        }
+
+        function displayResult() {
+            var xml = loadXMLDoc("menu.xml");
+            var xsl = loadXMLDoc("menu.xsl");
+
+            // For Internet Explorer
+            if (window.ActiveXObject || "ActiveXObject" in window) {
+                var ex = xml.transformNode(xsl);
+                document.getElementById("output").innerHTML = ex;
+            }
+            // For modern browsers
+            else if (document.implementation && document.implementation.createDocument) {
+                var xsltProcessor = new XSLTProcessor();
+                xsltProcessor.importStylesheet(xsl);
+                var resultDocument = xsltProcessor.transformToFragment(xml, document);
+                document.getElementById("output").appendChild(resultDocument);
+            }
+        }
+
+        window.onload = displayResult;
+    </script>
 </head>
 <body>
-    <h1>Breakfast Menu (Rendered via XML + XSLT)</h1>
-    <iframe src="menu.xml" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
-    <p>If the menu does not display, please open this page in a browser that supports XML + XSLT (like Chrome or Firefox).</p>
+    <h1>Breakfast Menu Viewer</h1>
+    <div id="output">Loading menu...</div>
 </body>
 </html>
