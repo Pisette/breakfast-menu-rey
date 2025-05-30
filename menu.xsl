@@ -33,18 +33,6 @@
       </head>
       <body>
 
-        <!-- Section A: All items -->
-        <h2>All Menu Items</h2>
-        <xsl:for-each select="breakfast_menu/food">
-          <div class="food-block">
-            <xsl:value-of select="name"/> - <xsl:value-of select="price"/>
-          </div>
-          <div class="food-description">
-            <xsl:value-of select="description"/>
-            (<xsl:value-of select="calories"/> calories per serving)
-          </div>
-        </xsl:for-each>
-
         <!-- Section B: Price > $5.00 -->
         <h2>Food whose price is greater than $5.00</h2>
         <xsl:for-each select="breakfast_menu/food">
